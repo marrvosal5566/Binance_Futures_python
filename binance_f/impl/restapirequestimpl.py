@@ -5,6 +5,8 @@ from binance_f.impl.utils.apisignature import create_signature_with_query
 from binance_f.impl.utils.inputchecker import *
 from binance_f.impl.utils.timeservice import *
 from binance_f.model import *
+from binance_f.model.liquidswapinfo import *
+from binance_f.model.priceticker import *
 # For develop
 from binance_f.base.printobject import *
 
@@ -84,10 +86,12 @@ class RestApiRequestImpl(object):
         request.header.update({"X-MBX-APIKEY": self.__api_key})
         request.url = url + "?" + builder.build_url()
         # For develop
+        '''
         print("====== Request ======")
         print(request)
         PrintMix.print_data(request)
         print("=====================")
+        '''
         return request
 
     def __create_request_by_put_with_signature(self, url, builder):
@@ -982,6 +986,33 @@ class RestApiRequestImpl(object):
 
         def parse(json_wrapper):
             result = ApiTradingStatus.json_parse(json_wrapper)
+            return result
+
+        request.json_parser = parse
+        return request
+
+    def get_liquid_swap_info(self, poolId):
+        builder = UrlParamsBuilder()
+        builder.put_url("poolId", poolId)
+
+        request = self.__create_request_by_get_with_signature("/sapi/v1/bswap/liquidity", builder)
+
+        def parse(json_wrapper):
+            data_list = json_wrapper.convert_2_array()
+            result = LiquidSwapInfo.json_parse(data_list.get_items()[0])
+            return result
+
+        request.json_parser = parse
+        return request
+
+    def get_price_ticker(self, symbol):
+        builder = UrlParamsBuilder()
+        builder.put_url("symbol", symbol)
+
+        request = self.__create_request_by_get("/api/v3/ticker/price", builder)
+
+        def parse(json_wrapper):
+            result=PriceTicker.json_parse(json_wrapper)
             return result
 
         request.json_parser = parse

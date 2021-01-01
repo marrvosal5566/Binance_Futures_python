@@ -605,3 +605,23 @@ class RequestClient(object):
         response = call_sync(self.request_impl.get_api_trading_stats(symbol))
         self.refresh_limits(response[1])
         return response[0]
+
+    def get_liquid_swap_info(self, poolId: 'long') -> any:
+        """
+        GET /sapi/v1/bswap/liquidity
+
+        liquid swap pool info
+        """
+        response = call_sync(self.request_impl.get_liquid_swap_info(poolId))
+        self.refresh_limits(response[1])
+        return response[0]
+
+    def get_price_ticker(self, symbol: 'str') -> any:
+        """
+        GET /api/v3/ticker/price
+
+        price info
+        """
+        response = call_sync(self.request_impl.get_price_ticker(symbol))
+        self.refresh_limits(response[1])
+        return response[0]

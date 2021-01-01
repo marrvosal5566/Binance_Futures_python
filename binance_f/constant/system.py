@@ -4,7 +4,8 @@ class WebSocketDefine:
 #    Uri = "wss://fstream.binance.com/ws"
 
 class RestApiDefine:
-    Url = "https://testnet.binancefuture.com"
+#    Url = "https://testnet.binancefuture.com"
+    Url = "https://api1.binance.com"
 #    Url = "https://fapi.binance.com"
 
 
