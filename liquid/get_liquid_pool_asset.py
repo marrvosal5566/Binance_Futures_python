@@ -11,6 +11,7 @@ poolDesc = [[2, "BUSDUSDT", ["BUSD", "USDT"], False],
             [5, "USDCUSDT", ["USDC", "USDT"], False]]
 
 info = open("liquid/info.csv", "a")
+no_price_info = open("liquid/no_price_info.csv", "a")
     
 request_client = RequestClient(api_key=g_api_key, secret_key=g_secret_key)
 with open('liquid/cost.conf') as json_file:
@@ -20,6 +21,10 @@ now = datetime.now().strftime("%D %H:%M")
 info.write("{},".format(now))
 all_pool_sum = 0.0
 all_pool_cost =0.0
+
+no_price_info.write("{},".format(now))
+no_price_all_pool_sum = 0.0
+
 for pool, sym, ass, inv in poolDesc:
     price = request_client.get_price_ticker(symbol=sym).price
     if inv:
@@ -35,8 +40,21 @@ for pool, sym, ass, inv in poolDesc:
     print("pool{}: {} {}, earn:{}({})".format(pool, total, ass[1], earn, earn_percent))
     info.write("{:.4f}({:.4%}),".format(earn, earn_percent))
 
+    no_price_total = float(asset[ass[0]]) + float(asset[ass[1]])
+    no_price_earn = no_price_total - pool_cost
+    no_price_earn_percent = no_price_earn / pool_cost
+    no_price_all_pool_sum += no_price_total
+    print("no_price pool{}: {} {}, earn:{}({})".format(pool, no_price_total, ass[1], no_price_earn, no_price_earn_percent))
+    no_price_info.write("{:.4f}({:.4%}),".format(no_price_earn, no_price_earn_percent))
+
 all_pool_earn = all_pool_sum - all_pool_cost
 all_pool_earn_percent = all_pool_earn / all_pool_cost
 info.write("{:.4f}({:.4%}),".format(all_pool_earn, all_pool_earn_percent))
 info.write("\n")
 info.close()
+
+no_price_all_pool_earn = no_price_all_pool_sum - all_pool_cost
+no_price_all_pool_earn_percent = no_price_all_pool_earn / all_pool_cost
+no_price_info.write("{:.4f}({:.4%}),".format(no_price_all_pool_earn, no_price_all_pool_earn_percent))
+no_price_info.write("\n")
+no_price_info.close()
